@@ -9,12 +9,13 @@ oldtz<-Sys.getenv('TZ')
 
 if(oldtz=='') {Sys.setenv(TZ="GMT")}
 
-stock.str='GDAXI' # what are we trying it on
+# stock.str='GDAXI' # what are we trying it on
+stock.str='GDAX2015'
 
 #MA parameters for MACD
 fastMA = 12
 slowMA = 26
-signalMA = 9
+signalMA = 10
 maType="EMA"
 
 currency('EUR')
@@ -46,7 +47,7 @@ account.st='macd'
 
 initPortf(portfolio.st,symbols=stock.str, initDate=initDate)
 
-initAcct(account.st,portfolios=portfolio.st, initDate=initDate)
+initAcct(account.st,portfolios=portfolio.st, initDate=initDate, initEq = initEq)
 
 initOrders(portfolio=portfolio.st,initDate=initDate)
 
@@ -75,7 +76,7 @@ add.rule(strat.st,name='ruleSignal', arguments = list(sigcol="signal.gt.zero", s
    # simple stoplimit order, with threshold multiplier
    #add.rule(strat.st,name='ruleSignal', arguments = list(sigcol="signal.gt.zero",sigval=TRUE, orderqty='all', ordertype='stoplimit', orderside='long', threshold=-.05,tmult=TRUE, orderset='exit2'),type='chain', parent='enter', label='risk',storefun=FALSE)
    # alternately, use a trailing order, also with a threshold multiplier
- add.rule(strat.st,name='ruleSignal', arguments = list(sigcol="signal.gt.zero",sigval=TRUE, orderqty='all', ordertype='stoptrailing', orderside='long', threshold=-20,tmult=FALSE, orderset='exit2'),	type='chain', parent='enter', label='trailingexit')
+ add.rule(strat.st,name='ruleSignal', arguments = list(sigcol="signal.gt.zero",sigval=TRUE, orderqty='all', ordertype='stoptrailing', orderside='long', threshold=-23,tmult=FALSE, orderset='exit2'),	type='chain', parent='enter', label='trailingexit')
    
 # exit
 add.rule(strat.st,name='ruleSignal', arguments = list(sigcol="signal.lt.zero", sigval=TRUE, orderqty='all', ordertype='market',orderside='long',threshold=NULL, orderset='exit2'), type='exit',label='exit')
@@ -83,7 +84,7 @@ add.rule(strat.st,name='ruleSignal', arguments = list(sigcol="signal.lt.zero", s
 # getSymbols(stock.str,from=initDate)
 start_t<-Sys.time()
 
-out<-applyStrategy(strat.st , portfolios=portfolio.st,parameters=list(nFast=fastMA, nSlow=slowMA, nSig=signalMA,maType=maType),verbose=TRUE)
+out<-applyStrategy(strat.st , portfolios=portfolio.st,parameters=list(nFast=fastMA, nSlow=slowMA, nSig=signalMA,maType=maType),verbose=FALSE)
 
 end_t<-Sys.time()
 print(end_t-start_t)
@@ -98,16 +99,21 @@ print("trade blotter portfolio update:")
 print(end_t-start_t)
 
 
-chart.Posn(Portfolio=portfolio.st,Symbol=stock.str)
+ chart.Posn(Portfolio=portfolio.st,Symbol=stock.str)
 
-plot(add_MACD(fast=fastMA, slow=slowMA, signal=signalMA,maType="EMA"))
+ plot(add_MACD(fast=fastMA, slow=slowMA, signal=signalMA,maType="EMA"))
 
 book<-getOrderBook('macd')
-stats = tradeStats('macd')
+stats <- tradeStats('macd')
+dailyStats <- dailyStats('macd', use = c("equity", "txns"))
 rets  = PortfReturns(account.st)
 
 # set tz as it was before the demo
 Sys.setenv(TZ=oldtz)
+
+#print(data.frame(t(stats[,-c(1,2)])))
+
+#adx.sar <- SAR(GDAX2015[ ,c("GDAXI.High", "GDAXI.Low")])
 
 ##### PLACE THIS BLOCK AT END OF DEMO SCRIPT ################### 
 # book  = getOrderBook(port)
