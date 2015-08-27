@@ -16,6 +16,7 @@ suppressWarnings(rm("account.macd","portfolio.macd",pos=.blotter))
 suppressWarnings(rm("account.st","portfolio.st","stock.str","stratMACD","initDate","initEq",'start_t','end_t'))
 
 stock.str='AAPL' # what are we trying it on
+# stock.str='DAX' # what are we trying it on
 
 #MA parameters for MACD
 fastMA = 12 
@@ -26,13 +27,16 @@ maType="EMA"
 currency('USD')
 stock(stock.str,currency='USD',multiplier=1)
 
+# currency('EUR')
+# stock(stock.str,currency='EUR',multiplier=1)
+
 #or use fake data
 #stock.str='sample_matrix' # what are we trying it on
 #data(sample_matrix)                 # data included in package xts
 #sample_matrix<-as.xts(sample_matrix)
 
 
-initDate='2006-12-31'
+initDate='2007-01-03'
 initEq=1000000
 portfolio.st='macd'
 account.st='macd'
@@ -86,7 +90,7 @@ chart.Posn(Portfolio=portfolio.st,Symbol=stock.str)
 plot(add_MACD(fast=fastMA, slow=slowMA, signal=signalMA,maType="EMA"))
 
 #look at the order book
-getOrderBook('macd')
+obook <- getOrderBook('macd')
 
 ###############################################################################
 # R (http://r-project.org/) Quantitative Strategy Model Framework
